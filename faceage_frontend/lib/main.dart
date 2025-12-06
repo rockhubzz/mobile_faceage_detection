@@ -18,9 +18,7 @@ class FaceAgeApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Face Age Detector',
-      theme: ThemeData(
-        primarySwatch: Colors.indigo,
-      ),
+      theme: ThemeData(primarySwatch: Colors.indigo),
       home: const HomePage(),
     );
   }
@@ -39,7 +37,8 @@ class _HomePageState extends State<HomePage> {
   bool _loading = false;
   String? _predictedAge;
   double? _confidence;
-  String _serverUrl = 'http://172.16.30.100:5000/predict'; // <- replace with your server IP
+  String _serverUrl =
+      'http://192.168.137.1:5000/predict'; // <- replace with your server IP
 
   Future<void> _pickImage(ImageSource source) async {
     try {
@@ -72,7 +71,9 @@ class _HomePageState extends State<HomePage> {
     try {
       final uri = Uri.parse(_serverUrl);
       final request = http.MultipartRequest('POST', uri);
-      request.files.add(await http.MultipartFile.fromPath('image', _imageFile!.path));
+      request.files.add(
+        await http.MultipartFile.fromPath('image', _imageFile!.path),
+      );
 
       final streamedResp = await request.send();
       final respStr = await streamedResp.stream.bytesToString();
@@ -84,11 +85,15 @@ class _HomePageState extends State<HomePage> {
         } else {
           setState(() {
             _predictedAge = data['predicted_age']?.toString();
-            _confidence = (data['confidence'] != null) ? (data['confidence'] as num).toDouble() : null;
+            _confidence = (data['confidence'] != null)
+                ? (data['confidence'] as num).toDouble()
+                : null;
           });
         }
       } else {
-        _showMessage('Server returned status \${streamedResp.statusCode}: \$respStr');
+        _showMessage(
+          'Server returned status \${streamedResp.statusCode}: \$respStr',
+        );
       }
     } catch (e) {
       _showMessage('Failed to send: \$e');
@@ -128,14 +133,28 @@ class _HomePageState extends State<HomePage> {
             Row(
               children: [
                 Text('Age: ', style: Theme.of(context).textTheme.titleMedium),
-                Text(_predictedAge!, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                Text(
+                  _predictedAge!,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: 8),
             Row(
               children: [
-                Text('Confidence: ', style: Theme.of(context).textTheme.titleMedium),
-                Text(_confidence != null ? '${(_confidence! * 100).toStringAsFixed(1)} %' : '—', style: const TextStyle(fontSize: 16)),
+                Text(
+                  'Confidence: ',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                Text(
+                  _confidence != null
+                      ? '${(_confidence! * 100).toStringAsFixed(1)} %'
+                      : '—',
+                  style: const TextStyle(fontSize: 16),
+                ),
               ],
             ),
           ],
@@ -159,7 +178,7 @@ class _HomePageState extends State<HomePage> {
               );
               if (result != null) setState(() => _serverUrl = result);
             },
-          )
+          ),
         ],
       ),
       body: SingleChildScrollView(
@@ -185,7 +204,13 @@ class _HomePageState extends State<HomePage> {
                   ),
                   ElevatedButton.icon(
                     onPressed: _loading ? null : _sendToServer,
-                    icon: _loading ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)) : const Icon(Icons.cloud_upload),
+                    icon: _loading
+                        ? const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Icon(Icons.cloud_upload),
                     label: const Text('Predict'),
                   ),
                 ],
@@ -197,7 +222,10 @@ class _HomePageState extends State<HomePage> {
             const SizedBox(height: 24),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Text('Server: \$_serverUrl', style: const TextStyle(fontSize: 12, color: Colors.grey)),
+              child: Text(
+                'Server: \$_serverUrl',
+                style: const TextStyle(fontSize: 12, color: Colors.grey),
+              ),
             ),
             const SizedBox(height: 24),
           ],
@@ -236,11 +264,19 @@ class _ServerDialogState extends State<_ServerDialog> {
       title: const Text('Server URL'),
       content: TextField(
         controller: _ctrl,
-        decoration: const InputDecoration(hintText: 'http://192.168.1.2:5000/predict'),
+        decoration: const InputDecoration(
+          hintText: 'http://192.168.1.2:5000/predict',
+        ),
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Cancel')),
-        TextButton(onPressed: () => Navigator.of(context).pop(_ctrl.text.trim()), child: const Text('Save')),
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancel'),
+        ),
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(_ctrl.text.trim()),
+          child: const Text('Save'),
+        ),
       ],
     );
   }
